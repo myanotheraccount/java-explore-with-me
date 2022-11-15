@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UserDto {
-    private Long id;
-    private String email;
-    private String name;
+public class Location {
+    private Float lat;
+    private Float lon;
 }

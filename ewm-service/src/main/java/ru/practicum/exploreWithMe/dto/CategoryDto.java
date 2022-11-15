@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UserDto {
+public class CategoryDto {
     private Long id;
-    private String email;
     private String name;
 }

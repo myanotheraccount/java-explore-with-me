@@ -7,7 +7,7 @@ services:
     depends_on:
       - stats-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5431/statsdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/statsdb
 
 
   stats-db:
@@ -15,7 +15,7 @@ services:
     volumes:
       - /var/lib/postgresql/data/
     ports:
-      - "6542:5431"
+      - "6542:5432"
     environment:
       - POSTGRES_DB=statsdb
       - POSTGRES_USER=root
@@ -28,7 +28,7 @@ services:
     depends_on:
       - ewm-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ewmdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewmdb
 
   ewm-db:
     image: postgres:latest
