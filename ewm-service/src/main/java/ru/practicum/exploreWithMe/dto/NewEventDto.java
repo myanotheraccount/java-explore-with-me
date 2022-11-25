@@ -2,9 +2,11 @@ package ru.practicum.exploreWithMe.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
+@ToString
 public class NewEventDto {
     private String annotation;
     private Long category;

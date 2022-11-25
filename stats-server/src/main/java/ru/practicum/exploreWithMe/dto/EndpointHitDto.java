@@ -2,13 +2,13 @@ package ru.practicum.exploreWithMe.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.ToString;
 
 @Data
 @AllArgsConstructor
-@ToString
-public class UserDto {
+public class EndpointHitDto {
     private Long id;
-    private String email;
-    private String name;
+    private String app;
+    private String ip;
+    private String timestamp;
+    private String uri;
 }
