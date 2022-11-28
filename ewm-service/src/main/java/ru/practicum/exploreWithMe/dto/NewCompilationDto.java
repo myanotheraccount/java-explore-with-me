@@ -1,12 +1,14 @@
 package ru.practicum.exploreWithMe.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @ToString
 public class NewCompilationDto {

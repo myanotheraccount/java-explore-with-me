@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exploreWithMe.dto.EndpointHitDto;
 import ru.practicum.exploreWithMe.dto.ViewStatsDto;
-import ru.practicum.exploreWithMe.mappers.EndpointMapper;
+import ru.practicum.exploreWithMe.mapper.EndpointMapper;
 import ru.practicum.exploreWithMe.repository.StatsRepository;
 
 import java.time.LocalDateTime;
@@ -29,8 +29,14 @@ public class StatsService {
     }
 
     public List<ViewStatsDto> get(String start, String end, List<String> uris, Boolean unique) {
-        LocalDateTime from = LocalDateTime.parse(start, formatter);
-        LocalDateTime to = LocalDateTime.parse(end, formatter);
+        LocalDateTime from = null;
+        LocalDateTime to = null;
+        try {
+            from = LocalDateTime.parse(start, formatter);
+            to = LocalDateTime.parse(end, formatter);
+        } catch (Exception e) {
+            throw new RuntimeException("даты введены некорректно");
+        }
         if (unique) {
             return statsRepository.getUniqueByFilter(from, to, uris);
         }

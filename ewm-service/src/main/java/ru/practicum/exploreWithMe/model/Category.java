@@ -12,25 +12,19 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "stats", schema = "public")
-@ToString
+@Table(name = "categories", schema = "public")
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class EndpointHit {
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "app", nullable = false)
-    private String app;
-    @Column(name = "ip", nullable = false, length = 50)
-    private String ip;
-    @Column(name = "timestamp", nullable = false)
-    private LocalDateTime timestamp;
-    @Column(name = "uri", nullable = false)
-    private String uri;
+
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
 }

@@ -1,7 +1,7 @@
 package ru.practicum.exploreWithMe.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.practicum.exploreWithMe.models.EventRequest;
+import ru.practicum.exploreWithMe.model.EventRequest;
 
 import java.util.List;
 
