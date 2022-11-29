@@ -1,6 +1,7 @@
 package ru.practicum.exploreWithMe.service;
 
 import org.springframework.data.domain.Pageable;
+import ru.practicum.exploreWithMe.dto.EventCommentDto;
 import ru.practicum.exploreWithMe.dto.EventFullDto;
 import ru.practicum.exploreWithMe.dto.EventShortDto;
 import ru.practicum.exploreWithMe.dto.NewEventDto;
@@ -41,4 +42,16 @@ public interface EventService {
     EventFullDto updateUserEvent(Long userId, UpdateEventRequest eventRequest);
 
     ParticipationRequestDto updateUserEventRequest(Long userId, Long eventId, Long requestId, ParticipationStateEnum stateEnum);
+
+    EventCommentDto addEventComment(EventCommentDto eventCommentDto, Long userId, Long eventId);
+
+    EventCommentDto updateEventComment(EventCommentDto eventCommentDto, Long userId, Long commentId);
+
+    List<EventCommentDto> getEventComments(Long eventId, Pageable pageable);
+
+    EventCommentDto publishComment(Long commentId);
+
+    void deleteEventCommentByAdmin(Long commentId);
+
+
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.exploreWithMe.dto.CategoryDto;
 import ru.practicum.exploreWithMe.dto.CompilationDto;
+import ru.practicum.exploreWithMe.dto.EventCommentDto;
 import ru.practicum.exploreWithMe.dto.EventFullDto;
 import ru.practicum.exploreWithMe.dto.NewCompilationDto;
 import ru.practicum.exploreWithMe.dto.NewEventDto;
@@ -114,6 +115,16 @@ public class AdminController {
             @RequestBody NewEventDto newEventDto
     ) {
         return eventService.updateEventByAdmin(eventId, newEventDto);
+    }
+
+    @DeleteMapping("/comments/events/{commentId}")
+    public void deleteEventComment(@PathVariable Long commentId) {
+        eventService.deleteEventCommentByAdmin(commentId);
+    }
+
+    @PatchMapping("/comments/events/{commentId}")
+    public EventCommentDto publishEventComment(@PathVariable Long commentId) {
+        return eventService.publishComment(commentId);
     }
 
     @PostMapping("/compilations")

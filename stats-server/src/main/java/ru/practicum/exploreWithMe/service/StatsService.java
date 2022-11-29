@@ -10,6 +10,7 @@ import ru.practicum.exploreWithMe.repository.StatsRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
@@ -29,12 +30,12 @@ public class StatsService {
     }
 
     public List<ViewStatsDto> get(String start, String end, List<String> uris, Boolean unique) {
-        LocalDateTime from = null;
-        LocalDateTime to = null;
+        LocalDateTime from;
+        LocalDateTime to;
         try {
             from = LocalDateTime.parse(start, formatter);
             to = LocalDateTime.parse(end, formatter);
-        } catch (Exception e) {
+        } catch (DateTimeParseException e) {
             throw new RuntimeException("даты введены некорректно");
         }
         if (unique) {

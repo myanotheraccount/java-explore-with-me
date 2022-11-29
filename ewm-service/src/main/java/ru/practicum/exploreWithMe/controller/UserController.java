@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.exploreWithMe.dto.EventCommentDto;
 import ru.practicum.exploreWithMe.dto.EventFullDto;
 import ru.practicum.exploreWithMe.dto.EventShortDto;
 import ru.practicum.exploreWithMe.dto.NewEventDto;
@@ -119,5 +120,21 @@ public class UserController {
             @PathVariable Long eventId
     ) {
         return eventService.rejectEvent(userId, eventId);
+    }
+
+    @PostMapping("/{userId}/events/{eventId}/comment")
+    public EventCommentDto addEventComment(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @RequestBody EventCommentDto commentDto) {
+        return eventService.addEventComment(commentDto, userId, eventId);
+    }
+
+    @PatchMapping("/{userId}/comments/{commentId}")
+    public EventCommentDto updateEventComment(
+            @PathVariable Long userId,
+            @PathVariable Long commentId,
+            @RequestBody EventCommentDto commentDto) {
+        return eventService.updateEventComment(commentDto, userId, commentId);
     }
 }
