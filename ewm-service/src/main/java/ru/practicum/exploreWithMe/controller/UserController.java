@@ -2,6 +2,7 @@ package ru.practicum.exploreWithMe.controller;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -130,6 +131,15 @@ public class UserController {
         return eventService.addEventComment(commentDto, userId, eventId);
     }
 
+    @GetMapping("/{userId}/comments")
+    public List<EventCommentDto> getEventComment(
+            @PathVariable Long userId,
+            @PositiveOrZero @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+            @Positive @RequestParam(value = "size", required = false, defaultValue = "50") int size
+    ) {
+        return eventService.getUserComments(userId, PageRequest.of(from / size, size));
+    }
+
     @PatchMapping("/{userId}/comments/{commentId}")
     public EventCommentDto updateEventComment(
             @PathVariable Long userId,
@@ -137,4 +147,12 @@ public class UserController {
             @RequestBody EventCommentDto commentDto) {
         return eventService.updateEventComment(commentDto, userId, commentId);
     }
+
+    @DeleteMapping("/{userId}/comments/{commentId}")
+    public void deleteEventComment(
+            @PathVariable Long userId,
+            @PathVariable Long commentId) {
+        eventService.deleteEventComment(userId, commentId);
+    }
+
 }

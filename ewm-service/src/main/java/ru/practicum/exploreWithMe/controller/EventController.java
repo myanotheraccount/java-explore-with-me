@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.exploreWithMe.client.StatsServerClient;
+import ru.practicum.exploreWithMe.dto.CommentStateEnum;
 import ru.practicum.exploreWithMe.dto.EventCommentDto;
 import ru.practicum.exploreWithMe.dto.EventFullDto;
 import ru.practicum.exploreWithMe.service.EventService;
@@ -65,10 +66,12 @@ public class EventController {
 
     @GetMapping("/{id}/comments")
     public List<EventCommentDto> getEventComments(
+            HttpServletRequest request,
             @PathVariable Long id,
             @PositiveOrZero @RequestParam(value = "from", required = false, defaultValue = "0") int from,
             @Positive @RequestParam(value = "size", required = false, defaultValue = "50") int size
     ) {
-        return eventService.getEventComments(id, PageRequest.of(from / size, size));
+        statsServerClient.setStat(request);
+        return eventService.getEventComments(id, CommentStateEnum.PUBLISHED, PageRequest.of(from / size, size));
     }
 }

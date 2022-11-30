@@ -28,18 +28,18 @@ public class EventComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "event_id")
+    @Column(name = "event_id", nullable = false)
     private Long eventId;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "comment")
+    @Column(name = "comment", nullable = false, length = 1000)
     private String comment;
 
-    @Column(name = "date")
+    @Column(name = "date", nullable = false)
     private LocalDateTime dateTime;
 
-    @Column(name = "published")
-    private Boolean published;
+    @Column(name = "state", nullable = false)
+    private String state;
 }

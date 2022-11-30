@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.exploreWithMe.dto.CategoryDto;
+import ru.practicum.exploreWithMe.dto.CommentStateEnum;
 import ru.practicum.exploreWithMe.dto.CompilationDto;
 import ru.practicum.exploreWithMe.dto.EventCommentDto;
 import ru.practicum.exploreWithMe.dto.EventFullDto;
@@ -117,14 +118,20 @@ public class AdminController {
         return eventService.updateEventByAdmin(eventId, newEventDto);
     }
 
-    @DeleteMapping("/comments/events/{commentId}")
-    public void deleteEventComment(@PathVariable Long commentId) {
-        eventService.deleteEventCommentByAdmin(commentId);
+    @GetMapping("/comments")
+    public List<EventCommentDto> getEventComments(
+            @PositiveOrZero @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+            @Positive @RequestParam(value = "size", required = false, defaultValue = "50") int size
+    ) {
+        return eventService.getEventCommentsByAdmin(CommentStateEnum.NEED_MODERATION, PageRequest.of(from / size, size));
     }
 
-    @PatchMapping("/comments/events/{commentId}")
-    public EventCommentDto publishEventComment(@PathVariable Long commentId) {
-        return eventService.publishComment(commentId);
+    @PatchMapping("/comments/{commentId}")
+    public EventCommentDto moderateEventComment(
+            @PathVariable Long commentId,
+            @RequestParam Boolean isPublished
+    ) {
+        return eventService.moderateComment(commentId, isPublished);
     }
 
     @PostMapping("/compilations")

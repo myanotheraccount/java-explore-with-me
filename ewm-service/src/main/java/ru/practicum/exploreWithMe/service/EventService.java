@@ -1,6 +1,7 @@
 package ru.practicum.exploreWithMe.service;
 
 import org.springframework.data.domain.Pageable;
+import ru.practicum.exploreWithMe.dto.CommentStateEnum;
 import ru.practicum.exploreWithMe.dto.EventCommentDto;
 import ru.practicum.exploreWithMe.dto.EventFullDto;
 import ru.practicum.exploreWithMe.dto.EventShortDto;
@@ -47,11 +48,15 @@ public interface EventService {
 
     EventCommentDto updateEventComment(EventCommentDto eventCommentDto, Long userId, Long commentId);
 
-    List<EventCommentDto> getEventComments(Long eventId, Pageable pageable);
+    List<EventCommentDto> getUserComments(Long userId, Pageable pageable);
 
-    EventCommentDto publishComment(Long commentId);
+    List<EventCommentDto> getEventCommentsByAdmin(CommentStateEnum state, Pageable pageable);
 
-    void deleteEventCommentByAdmin(Long commentId);
+    List<EventCommentDto> getEventComments(Long eventId, CommentStateEnum state, Pageable pageable);
+
+    EventCommentDto moderateComment(Long commentId, Boolean isPublished);
+
+    void deleteEventComment(Long userId, Long commentId);
 
 
 }

@@ -6,5 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.exploreWithMe.model.EventComment;
 
 public interface EventCommentRepository extends JpaRepository<EventComment, Long> {
-    Page<EventComment> getAllByEventIdAndPublishedTrue(Long eventId, Pageable pageable);
+    Page<EventComment> getAllByEventIdAndState(Long eventId, String state, Pageable pageable);
+
+    Page<EventComment> getAllByState(String state, Pageable pageable);
+
+    Page<EventComment> getAllByUserId(Long userId, Pageable pageable);
 }
