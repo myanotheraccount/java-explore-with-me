@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.exploreWithMe.dto.CommentStateEnum;
+import ru.practicum.exploreWithMe.dto.EventCommentDto;
 import ru.practicum.exploreWithMe.dto.EventFullDto;
 import ru.practicum.exploreWithMe.dto.EventShortDto;
+import ru.practicum.exploreWithMe.dto.EventStateEnum;
 import ru.practicum.exploreWithMe.dto.NewEventDto;
 import ru.practicum.exploreWithMe.dto.ParticipationRequestDto;
-import ru.practicum.exploreWithMe.dto.EventStateEnum;
 import ru.practicum.exploreWithMe.dto.ParticipationStateEnum;
 import ru.practicum.exploreWithMe.dto.UpdateEventRequest;
 import ru.practicum.exploreWithMe.exception.ValidationException;
@@ -16,8 +18,10 @@ import ru.practicum.exploreWithMe.mapper.CategoryMapper;
 import ru.practicum.exploreWithMe.mapper.EventMapper;
 import ru.practicum.exploreWithMe.mapper.UserMapper;
 import ru.practicum.exploreWithMe.model.Event;
+import ru.practicum.exploreWithMe.model.EventComment;
 import ru.practicum.exploreWithMe.model.EventRequest;
 import ru.practicum.exploreWithMe.repository.CategoryRepository;
+import ru.practicum.exploreWithMe.repository.EventCommentRepository;
 import ru.practicum.exploreWithMe.repository.EventRepository;
 import ru.practicum.exploreWithMe.repository.EventsRequestsRepository;
 import ru.practicum.exploreWithMe.repository.UserRepository;
@@ -34,12 +38,14 @@ public class EventServiceImpl implements EventService {
     private final EventsRequestsRepository eventsRequestsRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final EventCommentRepository commentRepository;
 
-    public EventServiceImpl(EventRepository eventRepository, EventsRequestsRepository eventsRequestsRepository, CategoryRepository categoryRepository, UserRepository userRepository) {
+    public EventServiceImpl(EventRepository eventRepository, EventsRequestsRepository eventsRequestsRepository, CategoryRepository categoryRepository, UserRepository userRepository, EventCommentRepository commentRepository) {
         this.eventRepository = eventRepository;
         this.eventsRequestsRepository = eventsRequestsRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -52,7 +58,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto addEvent(NewEventDto newEvent, Long userId) {
         try {
-            log.info(String.format("добавление события %s", newEvent));
+            log.info(String.format("добавление события %s пользователем %d", newEvent, userId));
             return toFullDto(eventRepository.save(EventMapper.fromNewDto(newEvent, userId)));
         } catch (Exception e) {
             throw new ValidationException("не удалось сохранить событие");
@@ -129,7 +135,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateEventByAdmin(Long eventId, NewEventDto newEventDto) {
-        log.info(String.format("обновление события %d", eventId));
+        log.info(String.format("обновление события %d данными %s", eventId, newEventDto));
         Event event = eventRepository.getReferenceById(eventId);
 
         if (newEventDto.getAnnotation() != null) {
@@ -222,7 +228,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public ParticipationRequestDto updateUserEventRequest(Long userId, Long eventId, Long requestId, ParticipationStateEnum stateEnum) {
-        log.info(String.format("обновление состяния заявки %d события %d пользователем %d", requestId, eventId, userId));
+        log.info(String.format("обновление состяния на %s заявки %d события %d пользователем %d", stateEnum, requestId, eventId, userId));
         Event event = eventRepository.getReferenceById(eventId);
         if (event.getInitiator().equals(userId)) {
             EventRequest eventRequest = eventsRequestsRepository.getReferenceById(requestId);
@@ -230,6 +236,72 @@ public class EventServiceImpl implements EventService {
             return EventMapper.toParticipationDto(eventsRequestsRepository.save(eventRequest));
         }
         throw new ValidationException("Только автор события может изменить заявку на участие");
+    }
+
+    @Override
+    @Transactional
+    public EventCommentDto addEventComment(EventCommentDto eventCommentDto, Long userId, Long eventId) {
+        log.info(String.format("Добавление комментария %s пользователем %d к событию %d", eventCommentDto, userId, eventId));
+        EventComment eventComment = EventMapper.fromCommentDto(eventCommentDto, userId, eventId);
+        eventComment.setDateTime(LocalDateTime.now());
+        eventComment.setState(CommentStateEnum.NEED_MODERATION.toString());
+        return EventMapper.toCommentDto(commentRepository.save(eventComment));
+    }
+
+    @Override
+    public List<EventCommentDto> getUserComments(Long userId, Pageable pageable) {
+        log.info(String.format("Получение своих комментариев пользователем %d", userId));
+        return commentRepository.getAllByUserId(userId, pageable).stream().map(EventMapper::toCommentDto).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public EventCommentDto updateEventComment(EventCommentDto eventCommentDto, Long userId, Long commentId) {
+        log.info(String.format("Обновление комментария %d данными %s пользователем %d", commentId, eventCommentDto, userId));
+        EventComment comment = commentRepository.getReferenceById(commentId);
+        if (comment.getId() == null) {
+            throw new ValidationException("Такого комментария не существует");
+        }
+        if (!comment.getUserId().equals(userId)) {
+            throw new ValidationException("Только автор может редактировать комментарий");
+        }
+        comment.setComment(eventCommentDto.getComment());
+        comment.setState(CommentStateEnum.NEED_MODERATION.toString());
+        return EventMapper.toCommentDto(commentRepository.save(comment));
+    }
+
+    @Override
+    public List<EventCommentDto> getEventCommentsByAdmin(CommentStateEnum state, Pageable pageable) {
+        log.info(String.format("Получения списка комментариев админом для модерации"));
+        return commentRepository.getAllByState(state.toString(), pageable).stream().map(EventMapper::toCommentDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventCommentDto> getEventComments(Long eventId, CommentStateEnum state, Pageable pageable) {
+        log.info(String.format("Получения списка комментариев к событию %d", eventId));
+        return commentRepository.getAllByEventIdAndState(eventId, state.toString(), pageable).stream()
+                .map(EventMapper::toCommentDto).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public EventCommentDto moderateComment(Long commentId, Boolean isPublished) {
+        log.info(String.format("Изменения статуса публиации комментария %d на %b", commentId, isPublished));
+        EventComment comment = commentRepository.getReferenceById(commentId);
+        comment.setState(isPublished ? CommentStateEnum.PUBLISHED.toString() : CommentStateEnum.REJECTED.toString());
+
+        return EventMapper.toCommentDto(commentRepository.save(comment));
+    }
+
+    @Override
+    @Transactional
+    public void deleteEventComment(Long userId, Long commentId) {
+        log.info(String.format("Удаление комментария %d пользователем", commentId, userId));
+        EventComment comment = commentRepository.getReferenceById(commentId);
+        if (!comment.getUserId().equals(userId)) {
+            throw new ValidationException("Только автор может удалить комментарий");
+        }
+        commentRepository.deleteById(commentId);
     }
 
     private EventFullDto toFullDto(Event event) {
@@ -245,5 +317,4 @@ public class EventServiceImpl implements EventService {
         shortDto.setInitiator(UserMapper.toShortDto(userRepository.getReferenceById(event.getInitiator())));
         return shortDto;
     }
-
 }

@@ -1,5 +1,6 @@
 package ru.practicum.exploreWithMe.mapper;
 
+import ru.practicum.exploreWithMe.dto.EventCommentDto;
 import ru.practicum.exploreWithMe.dto.EventFullDto;
 import ru.practicum.exploreWithMe.dto.EventShortDto;
 import ru.practicum.exploreWithMe.dto.Location;
@@ -7,6 +8,7 @@ import ru.practicum.exploreWithMe.dto.NewEventDto;
 import ru.practicum.exploreWithMe.dto.ParticipationRequestDto;
 import ru.practicum.exploreWithMe.dto.EventStateEnum;
 import ru.practicum.exploreWithMe.model.Event;
+import ru.practicum.exploreWithMe.model.EventComment;
 import ru.practicum.exploreWithMe.model.EventRequest;
 
 import java.time.LocalDateTime;
@@ -73,5 +75,22 @@ public class EventMapper {
                 .eventDate(event.getEventDate())
                 .paid(event.getPaid())
                 .build();
+    }
+
+    public static EventComment fromCommentDto(EventCommentDto dto, Long userId, Long eventId) {
+        return EventComment.builder()
+                .id(dto.getId())
+                .userId(userId)
+                .eventId(eventId)
+                .comment(dto.getComment())
+                .build();
+    }
+
+    public static EventCommentDto toCommentDto(EventComment comment) {
+        return new EventCommentDto(
+                comment.getId(),
+                comment.getComment(),
+                comment.getDateTime()
+        );
     }
 }
